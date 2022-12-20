@@ -21,8 +21,7 @@ class State:
 states = {}
 
 def start(update, context):
-    update.message.
-    _text('Welcome to the Task Manager chatbot! Use /menu to see the available commands.')
+    update.message.reply_text('Welcome to the Task Manager chatbot! Use /menu to see the available commands.')
 def handle_command(update):
     # Split the command into the command and arguments
     command, *args = update.message.text.split()
@@ -69,7 +68,6 @@ def handle_command(update):
         )
         # Store the state in the dictionary
         states[update.message.chat_id] = State.DELETE_TASK
-    
     elif command == '/done':
     # Get the list of tasks
     tasks = get_tasks(update.message.chat_id)
@@ -88,6 +86,24 @@ def handle_command(update):
     )
     # Store the state in the dictionary
     states[update.message.chat_id] = State.MARK_TASK_COMPLETE
+    elif command == '/undone':
+    # Get the list of tasks
+    tasks = get_tasks(update.message.chat_id)
+    # Display the tasks as a list of options
+    options = '\n'.join(f'{i+1}. {task[0]}' for i, task in enumerate(tasks))
+    message = 'Please select a task to mark as incomplete:\n' + options
+    # Send the message as a reply keyboard
+    reply_keyboard = [[str(i+1)] for i in range(len(tasks))]
+    update.message.reply_text(
+        message,
+        reply_markup=ReplyKeyboardMarkup(
+            reply_keyboard,
+            one_time_keyboard=True,
+            selective=True,
+        )
+    )
+    # Store the state in the dictionary
+    states[update.message.chat_id] = State.MARK_TASK_INCOMPLETE
 
 
 def handle_response(update, context):
@@ -120,7 +136,7 @@ def handle_response(update, context):
         # Remove the state from the dictionary
         states.pop(update.message.chat_id, None)
 
-
+def main():
 # Create the Updater and pass it the bot's token
 updater = Updater(5879721167:AAEl1EzoHTbLNJOHKeYJt_KlxzgBAsyaozU, use_context=True)
 
